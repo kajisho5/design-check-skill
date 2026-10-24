@@ -1,31 +1,33 @@
 ---
 name: design-check-skill
-description: 'Audit-only design completeness checker for Apple-platform apps. Checks an existing UI design, screen spec, demo mock or development prompt against per-platform checklists (iPhone, iPad, iPhone Duo, Mac, plus shared items), reports missing items （抜け）, fixes them, and re-checks in a loop until zero gaps remain. This skill does NOT create visual designs, layouts, mockups or assets — it only audits finished or drafted ones. Covers: HIG compliance, orientation policy, dark mode, Dynamic Type, VoiceOver, contrast, Safe Area, keyboard occlusion, iPad Split View / Stage Manager / pointer / hardware keyboard, Mac menu bar / shortcuts / resizable windows, iPhone Duo state consistency, app icon appearance variants, PNG deliverables. Use only when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
+description: 'Audit-only design completeness checker for Apple-platform apps. Checks an existing UI design, screen spec, demo mock or development prompt against per-platform checklists (iPhone, iPad, iPhone Duo, Mac, plus shared items), reports missing items （抜け）, fixes them, and repeats audit passes until three consecutive passes find no new gaps. This skill does NOT create visual designs, layouts, mockups or assets — it only audits finished or drafted ones. Covers: HIG compliance, orientation policy, dark mode, Dynamic Type, VoiceOver, contrast, Safe Area, keyboard occlusion, iPad Split View / Stage Manager / pointer / hardware keyboard, Mac menu bar / shortcuts / resizable windows, iPhone Duo state consistency, app icon appearance variants, PNG deliverables. Use only when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
 ---
 
 # design-check-skill
 
-Appleプラットフォーム向けデザインの「抜け」を監査するためのチェックリストと監査ループです。**監査専用であり、デザインそのもの（レイアウト、モック、素材）は作りません。** 対象は既存のUI設計・画面仕様・デモモック・開発プロンプト。**チェックして終わりにせず、抜けを直して再チェックし、抜けゼロになるまで回す**のがこのスキルの仕事です。
+Appleプラットフォーム向けデザインの「抜け」を監査するためのチェックリストと監査ループです。**監査専用であり、デザインそのもの（レイアウト、モック、素材）は作りません。** 対象は既存のUI設計・画面仕様・デモモック・開発プロンプト。**チェックして終わりにせず、抜けを直して再チェックし、「新規の抜けゼロ」が3パス連続するまで回す**のがこのスキルの仕事です。
 
 ## 監査ループ（必須手順）
 
 1. **対象を決める** — 設計書、モック、プロンプトなど、チェックする成果物を特定する。対象アプリの対応プラットフォームを確認し、関係するチェックリストだけを適用する（Mac版のないアプリにMacのリストは適用しない）
-2. **全項目を判定する** — チェックリストの各項目を「OK / 抜け / 対象外」で判定し、抜けには根拠（どの画面・どの記述に不足があるか）を付ける
+2. **全項目を判定する（1パス）** — チェックリストの各項目を「OK / 抜け / 対象外」で判定し、抜けには根拠（どの画面・どの記述に不足があるか）を付ける。各パスの結果（パス番号と新規の抜けの件数）は必ず記録する
 3. **抜けを直す** — 成果物自体を修正する。修正が設計判断を変える場合は、勝手に決めず選択肢と推奨をユーザーに提示する
-4. **再チェックする** — 修正後に全項目をもう一度判定する。新たな抜けが見つかれば 3 に戻る
-5. **報告する** — ループの結果（何周したか、見つけた抜けと修正内容、最終判定）を簡潔に報告する。抜けゼロで終わらなかった場合は、残った抜けと理由を明示する
+4. **再チェックする** — 修正後に全項目をもう一度判定し、次のパスとする。新たな抜けが見つかれば 3 に戻る
+5. **報告する** — ループの結果（総パス数、各パスの新規の抜け件数、修正内容、最終判定）を報告する。終了条件に到達しなかった場合は、残った抜けと理由を明示する
+
+**終了条件（厳格）**： 「新規の抜けゼロ」のパスが **3回連続** したら終了する。1回でも新たな抜けが出たパスがあれば、連続カウントはリセットし、修正して続ける。目安として最大6パスまで回し、それでも到達しない場合は残件を明示して報告する。「1回ゼロだった」だけでは終了しない
 
 判定は「書いてあるか」ではなく「実装・制作する側が迷わず再現できる具体性があるか」で行う。曖昧な記述は抜けとして扱う。
 
 ## チェックリスト： 共通（全プラットフォーム）
 
-- [ ] Apple HIGへの準拠が明示され、衝突時はHIG優先と決まっている
+- [ ] Apple HIGへの準拠が明示され、衝突時はHIG優先と決まっている [5]
 - [ ] ダークモード： 色がアセットカタログで定義され、ライト／ダーク両方で確認する手順がある
 - [ ] Dynamic Type： 最大文字サイズでもレイアウトが崩れない
 - [ ] VoiceOver： 主要操作にラベルがあり、操作順序が自然
-- [ ] コントラスト： テキストと背景のコントラスト比がHIGの基準を満たす（WCAG AA準拠： 17pt以下の文字は4.5:1以上、18pt以上または太字は3:1以上）
-- [ ] コントロールのサイズ： iOS / iPadOS のタップ対象は44×44pt以上（HIGの推奨デフォルト値。アクセシビリティ上の最小は28×28pt）。Macは後述のMac節に従う
-- [ ] 文字サイズ： カスタム書体でも最小サイズを下回らない（iOS / iPadOS は11pt、Macは10pt。デフォルトはiOS 17pt / Mac 13pt）
+- [ ] コントラスト： テキストと背景のコントラスト比がHIGの基準を満たす（WCAG AA準拠： 17pt以下の文字は4.5:1以上、18pt以上または太字は3:1以上）[1]
+- [ ] コントロールのサイズ： iOS / iPadOS のタップ対象は44×44pt以上（HIGの推奨デフォルト値。アクセシビリティ上の最小は28×28pt）。Macは後述のMac節に従う [1]
+- [ ] 文字サイズ： カスタム書体でも最小サイズを下回らない（iOS / iPadOS は11pt、Macは10pt。デフォルトはiOS 17pt / Mac 13pt）[1]
 - [ ] SF Symbolsを使用し、独自アイコンの乱造をしていない
 - [ ] 空状態（データゼロ）の画面がある
 - [ ] 無料版の制限（件数・機能）は、ユーザーが制限にぶつかる前に画面上で明示されている（残量表示など）。制限到達時の挙動も説明されている
@@ -70,19 +72,20 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 
 ## チェックリスト： アイコンと成果物の形式
 
-- [ ] アイコンはレイヤードアイコン作成ツール（例： kajisho5/fresnel）で作成し、Liquid Glassスタイルのレイヤードアイコン (.icon) になっている
-- [ ] ライト／ダーク／ティントの外観バリアントがある
-- [ ] アイコンに文字を入れておらず（HIG上は「ブランドに不可欠な場合を除き避ける」。自社ルールとして全面禁止で統一）、グリフが小サイズでも判別できる
-- [ ] App Store用アイコンは1024×1024px、PNG形式、透過なし、自分で角丸を付けていない（マスクはシステムが適用する）
+- [ ] アイコンはレイヤードアイコン作成ツール（例： kajisho5/fresnel [4]）で作成し、Liquid Glassスタイルのレイヤードアイコン (.icon) になっている [2][3]
+- [ ] ライト／ダーク／クリア／ティントの外観バリアントがある [2]
+- [ ] アイコンに文字を入れておらず（HIG上は「ブランドに不可欠な場合を除き避ける」。自社ルールとして全面禁止で統一）、グリフが小サイズでも判別できる [2]
+- [ ] App Store用アイコンは1024×1024px、PNG形式、透過なし、自分で角丸を付けていない（マスクはシステムが適用する）[2]
 - [ ] 視覚成果物はベクター原版に加えてラスター画像（PNG）のプレビューが添えられている（確認環境で表示できる形式にするため）
 
 ## 報告フォーマット
 
 ```
-監査ループ結果： N周で完了
-見つけた抜け： M件（内訳はプラットフォーム別に）
+監査ループ結果： 総Nパスで完了（新規抜けゼロが3パス連続したか）
+パスごとの記録： パス1 新規M件 / パス2 新規0件 / …
+見つけた抜け： （内訳はプラットフォーム別に）
 修正内容： （箇条書き）
-最終判定： 抜けゼロ / 残存する抜けとその理由
+最終判定： 抜けゼロ（3パス連続） / 残存する抜けとその理由
 ```
 
 ## やらないこと
@@ -90,3 +93,13 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 - チェックだけで終わらせて修正しない（ループを回し切るのが仕事）
 - 対象外プラットフォームの項目を理由に抜け判定する（例： Mac版のないアプリにMacモックを求めない）
 - デザインの好みを抜けとして扱う（抜けは「必要なのに無い・曖昧」だけ。好みは提案として分けて述べる）
+
+## 出典・参考
+
+チェックリストの数値・仕様は次の公式情報に基づきます。本文中の [n] はこの一覧への参照です。
+
+1. Apple Human Interface Guidelines — Accessibility（コントロールサイズ、文字サイズ、コントラスト比の基準値）: https://developer.apple.com/design/human-interface-guidelines/accessibility
+2. Apple Human Interface Guidelines — App Icons（アイコンのサイズ・形式・外観バリアント）: https://developer.apple.com/design/human-interface-guidelines/app-icons
+3. Apple Human Interface Guidelines — Materials（Liquid Glass）: https://developer.apple.com/design/human-interface-guidelines/materials
+4. fresnel（レイヤードアイコン作成ツール）: https://github.com/kajisho5/fresnel
+5. Apple Human Interface Guidelines（トップ）: https://developer.apple.com/design/human-interface-guidelines
