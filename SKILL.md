@@ -1,105 +1,168 @@
 ---
 name: design-check-skill
-description: 'Audit-only design completeness checker for Apple-platform apps. Checks an existing UI design, screen spec, demo mock or development prompt against per-platform checklists (iPhone, iPad, iPhone Duo, Mac, plus shared items), reports missing items （抜け）, fixes them, and repeats audit passes until three consecutive passes find no new gaps. This skill does NOT create visual designs, layouts, mockups or assets — it only audits finished or drafted ones. Covers: HIG compliance, orientation policy, dark mode, Dynamic Type, VoiceOver, contrast, Safe Area, keyboard occlusion, iPad Split View / Stage Manager / pointer / hardware keyboard, Mac menu bar / shortcuts / resizable windows, iPhone Duo state consistency, app icon appearance variants, PNG deliverables. Use only when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
+description: 'Audit-only design completeness checker for Apple-platform apps (iPhone, iPad, Mac, Apple Watch, plus "iPhone Duo" two-phone presentation mocks). Checks an existing UI design, screen spec, demo mock or development prompt against ID-numbered per-platform checklists, reports gaps (抜け) with evidence, fixes them (or writes fix instructions for visual files it cannot edit), and repeats audit passes from rotating viewpoints until three consecutive passes find no new gaps. Does NOT create designs, layouts, mockups or assets. Covers HIG compliance, size-class layout and resizing, orientation policy, Dark Mode, Dynamic Type, VoiceOver, contrast, Reduce Motion/Transparency, Safe Area, keyboard occlusion, iPad windowing/pointer/keyboard, Mac menus/shortcuts/windows, watchOS glanceability/complications, app icon specs and appearances, fictional mock data, PNG previews. Use when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
 ---
 
 # design-check-skill
 
-Appleプラットフォーム向けデザインの「抜け」を監査するためのチェックリストと監査ループです。**監査専用であり、デザインそのもの（レイアウト、モック、素材）は作りません。** 対象は既存のUI設計・画面仕様・デモモック・開発プロンプト。**チェックして終わりにせず、抜けを直して再チェックし、「新規の抜けゼロ」が3パス連続するまで回す**のがこのスキルの仕事です。
+Appleプラットフォーム向けデザインの「抜け」を監査するためのチェックリストと監査ループです。**監査専用であり、デザインそのもの（レイアウト、モック、素材）を新しく作ることはしません。** 対象は既存のUI設計・画面仕様・デモモック・開発プロンプト。**チェックして終わりにせず、抜けを直して再チェックし、「新規の抜けゼロ」が3パス連続するまで回す**のがこのスキルの仕事です。
+
+## 用語
+
+- **抜け**： 必要なのに書かれていない／作られていない項目、または「実装・制作する側が迷わず再現できる具体性」がない曖昧な記述。好みの問題は抜けに含めない
+- **新規の抜け**： そのパスで初めて見つかった抜け。**前のパスの修正で新たに生じた不整合（デグレ）も新規に数える**。前のパスで記録済みで、ユーザー判断待ちのため保留しているものは数えない（保留一覧に残す）
+- **パス**： 適用対象の全チェック項目を1回判定し終えること
 
 ## 監査ループ（必須手順）
 
-1. **対象を決める** — 設計書、モック、プロンプトなど、チェックする成果物を特定する。対象アプリの対応プラットフォームを確認し、関係するチェックリストだけを適用する（Mac版のないアプリにMacのリストは適用しない）
-2. **全項目を判定する（1パス）** — チェックリストの各項目を「OK / 抜け / 対象外」で判定し、抜けには根拠（どの画面・どの記述に不足があるか）を付ける。各パスの結果（パス番号と新規の抜けの件数）は必ず記録する
-3. **抜けを直す** — 成果物自体を修正する。修正が設計判断を変える場合は、勝手に決めず選択肢と推奨をユーザーに提示する
-4. **再チェックする** — 修正後に全項目をもう一度判定し、次のパスとする。新たな抜けが見つかれば 3 に戻る
-5. **報告する** — ループの結果（総パス数、各パスの新規の抜け件数、修正内容、最終判定）を報告する。終了条件に到達しなかった場合は、残った抜けと理由を明示する
+1. **対象と範囲を決める** — 監査する成果物と、そのアプリの対応プラットフォーム（iPhone / iPad / Mac / Watch / iPhone Duoモックの要否）を特定する。不明ならプロンプトや仕様の記述から判断し、判断した根拠を報告に書く。対象外プラットフォームのリストは適用しない
+2. **成果物の種類で修正方法を決める**
+   - **テキスト成果物**（設計書・画面仕様・開発プロンプト）： 成果物を直接書き換える
+   - **ソースを編集できる視覚成果物**（SVG / HTML / Figma 等でツールから編集可能なもの）： ソースを直接修正し、PNGプレビューも再書き出しする
+   - **編集できない視覚成果物**（PNG / JPEG だけ、手元にソースがないもの）： 自分では描き直さず、**修正指示書**（どの画面のどこを、どの基準で、どう直すか）を出す。ループは「修正待ちで一時停止」として報告し、修正版が渡されたら同じパス番号の続きから再開する
+3. **1パス判定する** — 適用対象の全項目を「OK / 抜け / 対象外」で判定し、抜けには**項目ID・根拠（どの画面・どの記述か）・修正案**を付ける。パスごとに下表の観点を切り替える（同じ見方を3回繰り返しても見落としは見つからないため）
 
-**終了条件（厳格）**： 「新規の抜けゼロ」のパスが **3回連続** したら終了する。1回でも新たな抜けが出たパスがあれば、連続カウントはリセットし、修正して続ける。目安として最大6パスまで回し、それでも到達しない場合は残件を明示して報告する。「1回ゼロだった」だけでは終了しない
+   | パス | 観点 | 見方 |
+   |---|---|---|
+   | 1, 4, 7 | チェックリスト順 | 共通→各プラットフォーム→アイコン・成果物の順に全項目を判定 |
+   | 2, 5, 8 | ユーザーフロー順 | 初回起動→主要フロー→権限拒否→データ空→無料版の上限到達→購入・復元→エラー の順に画面を辿り、各画面で関係する項目を判定 |
+   | 3, 6 | 状態マトリクス | ライト／ダーク × 標準／最大文字サイズ × 最小／最大ウィンドウ（iPadとMac）× 視差効果を減らす・透明度を下げる、の組み合わせで画面を想定して判定 |
 
-判定は「書いてあるか」ではなく「実装・制作する側が迷わず再現できる具体性があるか」で行う。曖昧な記述は抜けとして扱う。
+4. **抜けを直す** — 手順2の方法で修正する。修正が設計判断（機能範囲、課金、プラットフォーム追加、自社ルールの変更など）を変える場合は勝手に決めず、選択肢と推奨案を提示して**保留**にする。保留した項目は以後のパスで新規に数えない
+5. **再判定する** — 次のパス番号で手順3に戻る
+6. **報告する** — 「報告フォーマット」に従う
 
-## チェックリスト： 共通（全プラットフォーム）
+**終了条件（厳格）**
 
-- [ ] Apple HIGへの準拠が明示され、衝突時はHIG優先と決まっている [5]
-- [ ] ダークモード： 色がアセットカタログで定義され、ライト／ダーク両方で確認する手順がある
-- [ ] Dynamic Type： 最大文字サイズでもレイアウトが崩れない
-- [ ] VoiceOver： 主要操作にラベルがあり、操作順序が自然
-- [ ] コントラスト： テキストと背景のコントラスト比がHIGの基準を満たす（WCAG AA準拠： 17pt以下の文字は4.5:1以上、18pt以上または太字は3:1以上）[1]
-- [ ] コントロールのサイズ： iOS / iPadOS のタップ対象は44×44pt以上（HIGの推奨デフォルト値。アクセシビリティ上の最小は28×28pt）。Macは後述のMac節に従う [1]
-- [ ] 文字サイズ： カスタム書体でも最小サイズを下回らない（iOS / iPadOS は11pt、Macは10pt。デフォルトはiOS 17pt / Mac 13pt）[1]
-- [ ] SF Symbolsを使用し、独自アイコンの乱造をしていない
-- [ ] 空状態（データゼロ）の画面がある
-- [ ] 無料版の制限（件数・機能）は、ユーザーが制限にぶつかる前に画面上で明示されている（残量表示など）。制限到達時の挙動も説明されている
-- [ ] エラー・権限拒否時の画面と、設定アプリ等への代替導線がある
-- [ ] 入力時にソフトウェアキーボードで重要なUIや入力中の項目が隠れない
-- [ ] 起動画面はシンプルで、広告・ロゴアニメ・待機演出を入れていない
-- [ ] UI文字列は String Catalogs で管理され、ハードコードされていない
+- 「新規の抜けゼロ」のパスが **3回連続** したら終了する。1パスでも新規の抜けが出たら連続カウントは0に戻る
+- パス上限は **8**。上限に達しても3連続ゼロにならない場合は、そこで止めて残件と理由を報告する
+- 「1回ゼロだった」だけでは終了しない。保留がある場合は「3連続ゼロ・保留N件」として終了し、保留一覧を必ず添える
 
-## チェックリスト： iPhone
+## チェックリスト
 
-- [ ] 縦向き（ポートレート）基本。回転対応しない場合はその方針が明記されている（例外指定がある場合のみ回転対応）
-- [ ] Safe Area（Dynamic Island／ノッチ／ホームインジケータ）と重なる位置に操作要素がない
-- [ ] 片手操作を想定し、主要アクションが画面下部〜中部に届く配置になっている
-- [ ] ハーフモーダル（シート）の使い分けと、閉じる操作（スワイプ／ボタン）が一貫している
-- [ ] 主要画面のモックがiPhoneフレームで用意されている
+各項目の先頭はIDです。報告ではIDで参照します。[n] は末尾の出典番号です。
 
-## チェックリスト： iPad
+### 共通（全プラットフォーム）
 
-- [ ] 回転（縦・横）に対応し、どちらの向きでもレイアウトが成立する
-- [ ] Split View / Stage Manager でウィンドウ幅が変わっても崩れない（最小幅でも主要機能が使える）
-- [ ] 画面の広さを使い切るレイアウト（サイドバー＋詳細など、iPhone画面の引き伸ばしにしていない）
-- [ ] ポインタ（ホバー効果）とハードウェアキーボード（主要操作のショートカット）に対応している
-- [ ] 主要画面のモックがiPadフレームで用意されている
+- **C-01** Apple HIGへの準拠が明示され、HIGと実装側の判断が衝突したらHIG優先・報告すると決まっている [1]
+- **C-02** ダークモード： 色はアセットカタログまたはシステムカラーで定義され、ライト／ダーク両方で確認する手順がある [2]
+- **C-03** Dynamic Type： 最大文字サイズ（アクセシビリティサイズを含む）でも文字の切れ・重なりがなく、操作要素が画面外に押し出されない
+- **C-04** VoiceOver： 主要操作にラベルがあり、読み上げ順序が画面の論理順と一致している。画像だけのボタンにもラベルがある
+- **C-05** コントラスト： テキストと背景のコントラスト比が、17pt以下は4.5:1以上、18pt以上は3:1以上、太字は3:1以上（HIGがAccessibility Inspectorの基準として示すWCAG AA相当の値）。ライト・ダーク両方で確認する [2]
+- **C-06** 色だけで情報を区別していない（状態や種類を形・アイコン・文字でも示す）[2][11]
+- **C-07** 視差効果を減らす（Reduce Motion）がオンのとき、自動・反復アニメーションや拡大縮小の動きを抑える方針がある [2]
+- **C-08** 透明度を下げる／コントラストを上げる（Reduce Transparency / Increase Contrast）がオンのとき、Liquid Glassや半透明素材の上でも文字が読める。独自の半透明UIを作る場合はこの2設定での見え方が規定されている [2][3]
+- **C-09** コントロールのサイズと間隔： 各プラットフォーム節の数値を満たし、隣接するコントロールの間に十分な余白がある（目安： ベゼルありは周囲約12pt、ベゼルなしは約24pt）[2]
+- **C-10** 文字サイズ： カスタム書体でも各プラットフォームの最小サイズを下回らない（iOS / iPadOS 最小11pt・標準17pt、macOS 最小10pt・標準13pt、watchOS 最小12pt・標準16pt）[2]
+- **C-11** アイコン類はSF Symbolsを基本にし、独自アイコンは必要なものだけに限っている
+- **C-12** レイアウトはサイズクラス（実際に使える幅と高さ）で決めており、端末の種類や向きで決め打ちしていない [4]
+- **C-13** 空状態（データゼロ）の画面がある
+- **C-14** エラー時・権限拒否時の画面と、設定アプリ等への代替導線がある
+- **C-15** 無料版の制限（件数・機能）は、ユーザーが制限にぶつかる前に画面上で明示されている（残量表示、Pro限定項目の事前表示など）。制限到達時の挙動が説明され、データを無言で削除しない
+- **C-16** 入力時にソフトウェアキーボードで入力中の項目や確定ボタンが隠れない
+- **C-17** 起動画面（Launch Screen）がInfo.plistで構成されていて（iOS 27 SDK以降は提出の必須条件）、広告・ロゴアニメ・待機演出を入れていない [5]
+- **C-18** UI文字列は String Catalogs で管理され、ハードコードされていない
+- **C-19** モック・スクリーンショット・サンプルデータは**明らかに架空**の人名・住所・電話番号・会社名・画像を使っている（実在の人物・住所・企業・作品を使わない。宛名・連絡先系のアプリは特に注意）
 
-## チェックリスト： iPhone Duo（iPhone 2台並びの提示用モック）
+### iPhone
 
-- [ ] 2台の画面で状態が一致している（時刻、データ内容、選択状態、ダーク／ライトのモード）
-- [ ] 2画面の役割分担が分かる（例： 一覧と詳細、操作前と操作後）並びになっている
-- [ ] 端末のサイズ・角度・余白・整列が揃い、影や反射の表現が過剰でない
-- [ ] 小さい表示でも文字が読める（App Store掲載素材に転用する前提の解像度と余白）
-- [ ] PNG等のラスター画像でも書き出されている（確認する人の環境で表示できない形式だけに頼らない。例： スマートフォンではSVG単体を表示できないことがある）
+- **P-01** 画面の向きの方針が明記されている（例： 縦向き固定。回転対応する例外はアプリごとに明記）
+- **P-02** 向きを固定していても、ウィンドウサイズの変化（Mac上のiPhoneミラーリング、iOS 27以降のシーンのリサイズ等）でレイアウトが破綻しない [4][6]
+- **P-03** Safe Area（Dynamic Island／ホームインジケータ等）と重なる位置に操作要素がない
+- **P-04** 片手操作を想定し、主要アクションが画面下部〜中部に届く配置になっている
+- **P-05** シート（ハーフモーダル）の使い分けと、閉じる操作（スワイプ／ボタン）が全画面で一貫している
+- **P-06** タップ対象は44×44pt以上（HIGの標準値。28×28ptはアクセシビリティ上の最小で、これを下回らない）[2]
+- **P-07** 主要画面のモックがiPhoneフレームで用意されている
 
-## チェックリスト： Mac（Mac版・Mac対応があるアプリのみ）
+### iPad
 
-- [ ] 標準のメニューバー項目がある（アプリ情報、設定、ファイル、編集、表示、ウィンドウ、ヘルプ）
-- [ ] 主要操作にキーボードショートカットが割り当てられ、標準ショートカット（⌘C / ⌘V / ⌘W / ⌘Qなど）と衝突しない
-- [ ] ウィンドウのリサイズに追従し、最小サイズでも主要機能が使える
-- [ ] ポインタ前提の密度とホバー表現になっている（iPad画面の単純な拡大にしていない）
-- [ ] コントロールの標準サイズは28×28pt（最小20×20pt）を目安にしている（macOSのHIG値。iOSの44×44ptをそのまま持ち込んでいない）
-- [ ] Designed for iPad で動作させる場合は、その旨とMac専用UIを作らない方針が明記されている
-- [ ] 主要画面のモックがMacフレーム（ウィンドウ表示）で用意されている
+- **I-01** 縦・横どちらの向きでもレイアウトが成立する。`UIRequiresFullScreen` に頼っていない（iPadOS 26で非推奨。iOS / iPadOS 27 SDKでビルドすると、全画面固定にはならずリサイズされる）[6]
+- **I-02** ウィンドウ表示で自由にリサイズされても崩れない。最小ウィンドウでも主要機能が使え、細長い・正方形に近い・横長のどの形でも成立する [4][7]
+- **I-03** 画面の広さを使い切るレイアウト（サイドバー＋詳細など）で、iPhone画面の引き伸ばしにしていない
+- **I-04** ポインタ（ホバー効果）とハードウェアキーボード（主要操作のショートカット）に対応している。主要コマンドはiPadのメニューバーにも出し、メニューバーにしかない機能を作らない（メニューバーは通常隠れているため）[8]
+- **I-05** 主要画面のモックがiPadフレームで用意されている
 
-## チェックリスト： アイコンと成果物の形式
+### iPhone Duo（iPhone 2台並びの提示用モック）
 
-- [ ] アイコンはレイヤードアイコン作成ツール（例： kajisho5/fresnel [4]）で作成し、Liquid Glassスタイルのレイヤードアイコン (.icon) になっている [2][3]
-- [ ] ライト／ダーク／クリア／ティントの外観バリアントがある [2]
-- [ ] アイコンに文字を入れておらず（HIG上は「ブランドに不可欠な場合を除き避ける」。自社ルールとして全面禁止で統一）、グリフが小サイズでも判別できる [2]
-- [ ] App Store用アイコンは1024×1024px、PNG形式、透過なし、自分で角丸を付けていない（マスクはシステムが適用する）[2]
-- [ ] 視覚成果物はベクター原版に加えてラスター画像（PNG）のプレビューが添えられている（確認環境で表示できる形式にするため）
+「iPhone Duo」はAppleの用語ではなく、このスキルで使う提示形式の呼び名です。
+
+- **D-01** 2台の画面で状態が一致している（時刻、データ内容、選択状態、ライト／ダーク）
+- **D-02** 2画面の役割分担が分かる並びになっている（例： 一覧と詳細、操作前と操作後）
+- **D-03** 端末のサイズ・角度・余白・整列が揃い、影や反射の表現が過剰でない
+- **D-04** 小さく表示しても文字が読める
+
+### Mac（Mac版・Mac対応があるアプリのみ）
+
+- **M-01** Macでの提供形態が明記されている（SwiftUIのマルチプラットフォーム等のMacネイティブ／「Designed for iPad」で動作）。Designed for iPadの場合はMac専用UIを作らない方針も明記
+- **M-02** Macネイティブの場合、標準のメニューバー項目がある（アプリメニューの情報・設定・終了、編集、表示、ウィンドウ、ヘルプ。書類を扱うアプリはファイルも）[8]
+- **M-03** 主要操作にキーボードショートカットが割り当てられ、標準ショートカット（⌘C / ⌘V / ⌘W / ⌘Q / ⌘, など）と衝突しない [8]
+- **M-04** ウィンドウのリサイズに追従し、最小サイズでも主要機能が使える
+- **M-05** ポインタ前提の密度とホバー表現になっている（iPad画面の単純な拡大にしていない）
+- **M-06** コントロールの標準サイズは28×28pt（最小20×20pt）を目安にしている（iOSの44×44ptをそのまま持ち込んでいない）[2]
+- **M-07** 主要画面のモックがMacのウィンドウ表示で用意されている
+
+### Apple Watch（Watchアプリがあるアプリのみ）
+
+- **W-01** 一目で分かる（glanceable）1画面完結の操作が中心で、1回の操作が短時間で終わる設計になっている [9]
+- **W-02** 画面階層が浅く、縦方向の移動はDigital Crownでできる [9]
+- **W-03** コンプリケーション（ウォッチフェイス上の表示）と通知で何を見せるかが決まっている [9]
+- **W-04** 常時表示（Always On）で手首を下げたときの表示内容が決まっている（個人情報や細かい数値を出し続けない等）[9]
+- **W-05** iPhoneが近くにないときの動作（単独で動く範囲と、同期待ちの表示）が決まっている [9]
+- **W-06** タップ対象は44×44pt（最小28×28pt）、文字は標準16pt・最小12ptを目安にしている [2]
+- **W-07** 主要画面のモックがApple Watchフレームで用意されている
+
+### アイコンと成果物の形式
+
+- **A-01** アイコンはレイヤードアイコン（.icon）として作られている。作成ツールは Icon Composer（Xcode同梱のApple公式ツール）または同等のツール（例： kajisho5/fresnel [12]）[10]
+- **A-02** レイヤーは正方形でマスク前のもの（自分で角丸・円形マスクを付けていない）。背景レイヤーを読み込む場合は全面・不透明。前景はベクター（SVG / PDF）を優先し、文字はアウトライン化している [10]
+- **A-03** ハイライト・影・ぼかし・光彩などの効果を自分で描き込まず、システムの効果に任せている [10]
+- **A-04** iOS / iPadOS / macOS は、デフォルト／ダーク／クリア（ライト・ダーク）／ティント（ライト・ダーク）の外観を確認済み。HIG上は用意しない外観をシステムが自動生成するが、**自社ルールとして全外観を用意して確認する** [10]
+- **A-05** キャンバスサイズが正しい（iOS / iPadOS / macOS は1024×1024px、watchOSは1088×1088pxで円形にマスクされる）。watchOSのアイコンは背景を黒にしていない [10]
+- **A-06** アイコンに文字を入れていない（HIG上は「体験やブランドに不可欠な場合だけ」。**自社ルールとして全面禁止**）。グリフが小サイズでも判別でき、写真やUI部品の複製を使っていない [10]
+- **A-07** 視覚成果物はベクター原版に加えてPNGのプレビューが添えられている（スマートフォン等、SVGを表示できない環境で確認するため）
+- **A-08** App Store掲載用スクリーンショットに転用するモックは、App Store Connectの必須サイズで書き出せる（透過なしのPNG / JPEG。サイズは提出時に最新の仕様を確認）[13]
 
 ## 報告フォーマット
 
 ```
-監査ループ結果： 総Nパスで完了（新規抜けゼロが3パス連続したか）
-パスごとの記録： パス1 新規M件 / パス2 新規0件 / …
-見つけた抜け： （内訳はプラットフォーム別に）
-修正内容： （箇条書き）
-最終判定： 抜けゼロ（3パス連続） / 残存する抜けとその理由
+対象： （成果物名） ／ 対応プラットフォーム： （判断根拠）
+監査ループ結果： 総Nパスで終了（3連続ゼロ ／ 上限到達 ／ 修正待ちで一時停止）
+
+| パス | 観点 | 新規の抜け | 連続ゼロ |
+|---|---|---|---|
+| 1 | チェックリスト順 | 5 | 0 |
+| 2 | ユーザーフロー順 | 1 | 0 |
+| 3 | 状態マトリクス | 0 | 1 |
+| … | | | |
+
+見つけた抜け： ID ／ 根拠 ／ 修正内容（プラットフォーム別）
+保留（ユーザー判断待ち）： ID ／ 選択肢 ／ 推奨案
+提案（抜けではない好みの指摘）： 箇条書き
+最終判定： 抜けゼロ（3パス連続）／ 残存する抜けとその理由
 ```
 
 ## やらないこと
 
 - チェックだけで終わらせて修正しない（ループを回し切るのが仕事）
-- 対象外プラットフォームの項目を理由に抜け判定する（例： Mac版のないアプリにMacモックを求めない）
-- デザインの好みを抜けとして扱う（抜けは「必要なのに無い・曖昧」だけ。好みは提案として分けて述べる）
+- 対象外プラットフォームの項目を抜けと判定する（例： Mac版のないアプリにMacモックを求めない）
+- デザインの好みを抜けとして扱う（好みは「提案」として分けて書く）
+- 編集できない画像を、自分で描き直した別物に差し替える（修正指示書を出す）
+- 設計判断を勝手に変える（保留にして選択肢を出す）
 
 ## 出典・参考
 
-チェックリストの数値・仕様は次の公式情報に基づきます。本文中の [n] はこの一覧への参照です。
+チェックリストの数値・仕様は次の公式情報に基づきます（2026年10月時点で確認）。OSのメジャーアップデート時は数値を再確認してください。
 
-1. Apple Human Interface Guidelines — Accessibility（コントロールサイズ、文字サイズ、コントラスト比の基準値）: https://developer.apple.com/design/human-interface-guidelines/accessibility
-2. Apple Human Interface Guidelines — App Icons（アイコンのサイズ・形式・外観バリアント）: https://developer.apple.com/design/human-interface-guidelines/app-icons
-3. Apple Human Interface Guidelines — Materials（Liquid Glass）: https://developer.apple.com/design/human-interface-guidelines/materials
-4. fresnel（レイヤードアイコン作成ツール）: https://github.com/kajisho5/fresnel
-5. Apple Human Interface Guidelines（トップ）: https://developer.apple.com/design/human-interface-guidelines
+1. Apple Human Interface Guidelines（トップ）: https://developer.apple.com/design/human-interface-guidelines
+2. HIG — Accessibility（コントロールのサイズと間隔、文字サイズ、コントラスト比、視差効果を減らす）: https://developer.apple.com/design/human-interface-guidelines/accessibility
+3. HIG — Materials（Liquid Glass。透明度を下げる・コントラストを上げる設定での見え方）: https://developer.apple.com/design/human-interface-guidelines/materials
+4. HIG — Layout（サイズクラス、向きを固定してもリサイズに対応する）: https://developer.apple.com/design/human-interface-guidelines/layout
+5. TN3208: Preparing your app’s launch screen to meet App Store requirements（iOS 27 SDK以降は起動画面が必須）: https://developer.apple.com/documentation/technotes/tn3208-preparing-your-apps-launch-screen-to-meet-app-store-requirements
+6. TN3192: Migrating your app from the deprecated UIRequiresFullScreen key: https://developer.apple.com/documentation/technotes/tn3192-migrating-your-app-from-the-deprecated-uirequiresfullscreen-key
+7. HIG — Multitasking（iPadのフルスクリーン／ウィンドウ表示）: https://developer.apple.com/design/human-interface-guidelines/multitasking
+8. HIG — The menu bar: https://developer.apple.com/design/human-interface-guidelines/the-menu-bar
+9. HIG — Designing for watchOS: https://developer.apple.com/design/human-interface-guidelines/designing-for-watchos
+10. HIG — App icons（レイヤー、外観、仕様表）: https://developer.apple.com/design/human-interface-guidelines/app-icons
+11. App Store Connect Help — Accessibility Nutrition Labels（「色だけに頼らない区別」等の申告項目）: https://developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels
+12. fresnel（レイヤードアイコン作成ツール）: https://github.com/kajisho5/fresnel
+13. App Store Connect Help — Screenshot specifications: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
