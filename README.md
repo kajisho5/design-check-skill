@@ -80,12 +80,12 @@ A. 機能範囲・課金・プラットフォーム追加などの設計判断�
 **Q. チェックリストの数値（44×44ptなど）の根拠は？**
 A. Apple の Human Interface Guidelines（Accessibility、App icons など）です。SKILL.md 末尾の「出典・参考」に公式ページへのリンクがあります。
 
-**Q. app-factory-skill との関係は？**
-A. app-factory-skill がHIGに沿ってデザイン（設計書とモック）を作る側、このスキルがそれを監査して抜けを直す側です。単独でも使えます。
+**Q. hig-design-skill との関係は？**
+A. hig-design-skill がHIGに沿ってデザイン（設計書とモック）を作る側、このスキルがそれを監査して抜けを直す側です。単独でも使えます。
 
 ## 関連プロジェクト
 
-- [app-factory-skill](https://github.com/kajisho5/app-factory-skill) — HIGに沿った iPhone / iPhone Duo / iPad / Mac / Apple Watch のデザイン制作（このスキルと併用）
+- [hig-design-skill](https://github.com/kajisho5/hig-design-skill) — HIGに沿った iPhone / iPhone Duo / iPad / Mac / Apple Watch のデザイン制作（このスキルと併用）
 - [fresnel](https://github.com/kajisho5/fresnel) — Liquid Glass アイコン作成ツール
 
 ## ライセンス
