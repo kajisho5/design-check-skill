@@ -1,6 +1,6 @@
 ---
 name: design-check-skill
-description: 'Audit-only design completeness checker for Apple-platform apps (iPhone, iPhone Duo foldable, iPad, Mac, Apple Watch). Checks an existing UI design, screen spec, demo mock or development prompt against ID-numbered per-platform checklists, reports gaps (抜け) with evidence, fixes them (or writes fix instructions for visual files it cannot edit), and repeats audit passes from rotating viewpoints until three consecutive passes find no new gaps. Does NOT create designs, layouts, mockups or assets. Covers HIG compliance, size-class layout and resizing, orientation policy, Dark Mode, Dynamic Type, VoiceOver, contrast, Reduce Motion/Transparency, Safe Area, keyboard occlusion, iPhone Duo outer/inner displays and Split View, iPad windowing/pointer/keyboard, Mac menus/shortcuts/windows, watchOS glanceability/complications, app icon specs and appearances, fictional mock data, PNG previews. Use when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
+description: 'Audit-only design completeness checker for Apple-platform apps (iPhone, iPhone Duo foldable, iPad, Mac, Apple Watch). Checks an existing UI design, screen spec, demo mock or development prompt against ID-numbered per-platform checklists, reports gaps (抜け) with evidence, fixes them (or writes fix instructions for visual files it cannot edit), and repeats audit passes, each from a viewpoint not yet used in the loop, until three consecutive passes find no new gaps. Does NOT create designs, layouts, mockups or assets. Covers HIG compliance, size-class layout and resizing, orientation policy, Dark Mode, Dynamic Type, VoiceOver, contrast, Reduce Motion/Transparency, Safe Area, keyboard occlusion, iPhone Duo outer/inner displays and Split View, iPad windowing/pointer/keyboard, Mac menus/shortcuts/windows, watchOS glanceability/complications, app icon specs and appearances, fictional mock data, PNG previews. Use when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
 ---
 
 # design-check-skill
@@ -20,13 +20,18 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
    - **テキスト成果物**（設計書・画面仕様・開発プロンプト）： 成果物を直接書き換える
    - **ソースを編集できる視覚成果物**（SVG / HTML / Figma 等でツールから編集可能なもの）： ソースを直接修正し、PNGプレビューも再書き出しする
    - **編集できない視覚成果物**（PNG / JPEG だけ、手元にソースがないもの）： 自分では描き直さず、**修正指示書**（どの画面のどこを、どの基準で、どう直すか）を出す。ループは「修正待ちで一時停止」として報告し、修正版が渡されたら同じパス番号の続きから再開する
-3. **1パス判定する** — 適用対象の全項目を「OK / 抜け / 対象外」で判定し、抜けには**項目ID・根拠（どの画面・どの記述か）・修正案**を付ける。パスごとに下表の観点を切り替える（同じ見方を3回繰り返しても見落としは見つからないため）
+3. **1パス判定する** — 適用対象の全項目を「OK / 抜け / 対象外」で判定し、抜けには**項目ID・根拠（どの画面・どの記述か）・修正案**を付ける。**パスごとに、そのループでまだ使っていない観点を下表から1つ選び、その観点で全項目を見直す**（同じ観点は1つのループで2回使わない。同じ見方を繰り返しても見落としは見つからないため）。表の順に使うのを基本とし、対象に合わない観点（例： 1プラットフォームだけのアプリで V-05）は飛ばして次を使う。観点から見つかった、チェックリストにない種類の抜けも記録する（IDは最も近い項目か「追加」）
 
-   | パス | 観点 | 見方 |
+   | ID | 観点 | 見方 |
    |---|---|---|
-   | 1, 4, 7 | チェックリスト順 | 共通→各プラットフォーム→アイコン・成果物の順に全項目を判定 |
-   | 2, 5, 8 | ユーザーフロー順 | 初回起動→主要フロー→権限拒否→データ空→無料版の上限到達→購入・復元→エラー の順に画面を辿り、各画面で関係する項目を判定 |
-   | 3, 6 | 状態マトリクス | ライト／ダーク × 標準／最大文字サイズ × 最小／最大ウィンドウ（iPadとMac）× 外側／内側／内側の Split View（iPhone Duo）× 視差効果を減らす・透明度を下げる、の組み合わせで画面を想定して判定 |
+   | V-01 | チェックリスト順 | 共通→各プラットフォーム→アイコン・成果物の順に、全項目を上から判定する |
+   | V-02 | ユーザーフロー順 | 初回起動→主要フロー→権限拒否→データ空→無料版の上限到達→購入・復元→エラー の順に画面を辿り、各画面で関係する項目を判定する |
+   | V-03 | 状態マトリクス | ライト／ダーク × 標準／最大文字サイズ × 最小／最大ウィンドウ（iPadとMac）× 外側／内側／内側の Split View（iPhone Duo）× 視差効果を減らす・透明度を下げる の組み合わせで、各画面を想定する |
+   | V-04 | 支援技術の利用者 | VoiceOver の読み上げ順に画面を辿る、画面を見ずに操作する、色の見分けがつきにくい、指先の細かい操作が難しい、という利用者になったつもりで判定する |
+   | V-05 | プラットフォーム横断の一貫性 | 同じ機能が各端末で同じ名前・同じアイコン・同じ状態表示になっているか、端末ごとの違いが HIG に沿った意図的なものかを、機能単位で横に並べて比べる |
+   | V-06 | 極端なデータと文言の長さ | 0件・1件・大量の件数、とても長い名前や本文、桁の多い数字、英語など文字数が増える言語に訳したとき、の各条件で崩れ・省略・はみ出しを探す |
+   | V-07 | 文言と用語 | ボタン名・見出し・空状態・エラー・確認ダイアログの文言を全部読み、具体的で、端末間で用語がそろい、誤解や誇張がないかを判定する |
+   | V-08 | 作る人の目 | 実装・制作する人がこの資料だけで迷わず作れるか（寸法・色・文字の指定、画面遷移、例外時の挙動、素材の書き出し形式に指定漏れがないか）を判定する |
 
 4. **抜けを直す** — 手順2の方法で修正する。修正が設計判断（機能範囲、課金、プラットフォーム追加、自社ルールの変更など）を変える場合は勝手に決めず、選択肢と推奨案を提示して**保留**にする。保留した項目は以後のパスで新規に数えない
 5. **再判定する** — 次のパス番号で手順3に戻る
@@ -35,7 +40,8 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 **終了条件（厳格）**
 
 - 「新規の抜けゼロ」のパスが **3回連続** したら終了する。1パスでも新規の抜けが出たら連続カウントは0に戻る
-- パス上限は **8**。上限に達しても3連続ゼロにならない場合は、そこで止めて残件と理由を報告する
+- パス上限は **8**（観点が8つなので、1ループで全観点を1回ずつ使い切ったところが上限）。上限に達しても3連続ゼロにならない場合は、そこで止めて残件と理由を報告する
+- 成果物の範囲が変わった（プラットフォームの追加など）ときは新しいループとして数え直し、観点も V-01 から使い直してよい
 - 「1回ゼロだった」だけでは終了しない。保留がある場合は「3連続ゼロ・保留N件」として終了し、保留一覧を必ず添える
 
 ## チェックリスト
@@ -134,9 +140,9 @@ iPhone Duo は2026年9月発表の折りたたみ iPhone（外側5.4インチ、
 
 | パス | 観点 | 新規の抜け | 連続ゼロ |
 |---|---|---|---|
-| 1 | チェックリスト順 | 5 | 0 |
-| 2 | ユーザーフロー順 | 1 | 0 |
-| 3 | 状態マトリクス | 0 | 1 |
+| 1 | V-01 チェックリスト順 | 5 | 0 |
+| 2 | V-02 ユーザーフロー順 | 1 | 0 |
+| 3 | V-03 状態マトリクス | 0 | 1 |
 | … | | | |
 
 見つけた抜け： ID ／ 根拠 ／ 修正内容（プラットフォーム別）
