@@ -81,11 +81,11 @@ A. 機能範囲・課金・プラットフォーム追加などの設計判断�
 A. Apple の Human Interface Guidelines（Accessibility、App icons など）です。SKILL.md 末尾の「出典・参考」に公式ページへのリンクがあります。
 
 **Q. app-factory-skill との関係は？**
-A. app-factory-skill（アプリ量産用の開発プロンプト生成）がプロンプトを作る側、このスキルがそのプロンプトのデザイン面を監査する側です。単独でも使えます。
+A. app-factory-skill がHIGに沿ってデザイン（設計書とモック）を作る側、このスキルがそれを監査して抜けを直す側です。単独でも使えます。
 
 ## 関連プロジェクト
 
-- [app-factory-skill](https://github.com/kajisho5/app-factory-skill) — アプリ量産の開発プロンプト生成（このスキルと併用）
+- [app-factory-skill](https://github.com/kajisho5/app-factory-skill) — HIGに沿った iPhone / iPhone Duo / iPad / Mac / Apple Watch のデザイン制作（このスキルと併用）
 - [fresnel](https://github.com/kajisho5/fresnel) — Liquid Glass アイコン作成ツール
 
 ## ライセンス
