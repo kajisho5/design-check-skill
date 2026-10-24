@@ -95,11 +95,12 @@ iPhone Duo は2026年9月発表の折りたたみ iPhone（外側5.4インチ、
 
 - **D-01** 外側（閉じた状態）と内側（開いた状態）の両方の主要画面が設計され、モックがある [14]
 - **D-02** レイアウトを向きではなくサイズクラスで決めている。外側は通常の iPhone と同じ（縦向き＝横 compact・縦 regular）、内側は横・縦とも regular。内側はアプリの対応する向きの指定に従わないことを前提にしている [15]
-- **D-03** 内側でサイドバー（タブをサイドバーにする、またはサイドバー＋一覧＋詳細）を使い、iPhone 画面の引き伸ばしにしていない。内側の Split View（画面の左右どちらか半分）でも主要機能が使える [15]
+- **D-03** 内側で一覧と詳細を並べるなど、iPhone 画面の引き伸ばしにしていない。内側の Split View（画面の左右どちらか半分）でも主要機能が使える [15][16]
 - **D-04** 開閉したときに、表示中の画面・選択・入力中の内容が引き継がれる [14]
-- **D-05** 標準のバーのボタンが縦に並ぶこと、ステータスバー・Dynamic Island が画面の横側に来ることを前提に、操作要素がそれらと重ならない。Safe Area は左右・上下で非対称として扱う [14][15]
+- **D-05** 外側と内側の横向きでは、ふつう上下にあるものが後端に縦一列で並ぶ（外側は上から Dynamic Island → ステータスバー → ツールバー → タブバー。タブバーも横側）ことを前提にしている。内側の縦向きは横向きのバー。ツールバーは 戻る／閉じる → 強調操作 → 残り の順で、記号のボタンに題名もある。Safe Area は非対称として扱う [16]
 - **D-06** 横向きにも対応している（テントのように立てて置かれるため推奨）[15]
 - **D-07** スクリーンショット用の画像が iPhone Duo の寸法（外側 1398 × 2034 px、内側 2007 × 2853 px）で書き出せる。現時点は任意だが、2027年4月以降は iOS 27.1 SDK 以降でビルドしたアプリで必須 [13]
+- **D-08** 半分折ったときの中央の折り目（内側の縦向きでは横一文字、横向きでは縦一文字）に、見出し・ボタン・画像・数値など重要な要素がかかっていない（連続スクロールの本文やリストは可）。左右に分ける配置は中央で均等、グリッドは偶数列 [16]
 
 ### Mac（Mac版・Mac対応があるアプリのみ）
 
@@ -179,3 +180,4 @@ iPhone Duo は2026年9月発表の折りたたみ iPhone（外側5.4インチ、
 13. App Store Connect Help — Screenshot specifications: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 14. Apple Newsroom — Apple unveils iPhone Duo（2026-09-10）: https://www.apple.com/my/newsroom/2026/09/apple-unveils-iphone-duo/
 15. Apple Developer Tech Talk — Prepare your app for iPhone Duo: https://developer.apple.com/videos/play/tech-talks/111461/
+16. HIG — Designing for iPhone Duo: https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo
