@@ -1,0 +1,33 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  skill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check SKILL.md frontmatter and checklist IDs
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          t = open("SKILL.md", encoding="utf-8").read()
+          fm = re.match(r"---\n(.*?)\n---", t, re.S).group(1)
+          name = re.search(r"^name: (.*)$", fm, re.M).group(1)
+          desc = re.search(r"^description: '(.*)'$", fm, re.M).group(1)
+          ids = re.findall(r"\*\*([A-Z]-\d{2})\*\*", t)
+          dup = sorted({i for i in ids if ids.count(i) > 1})
+          refs = set(re.findall(r"^(\d+)\. ", t.split("## 出典・参考")[1], re.M))
+          cited = set(re.findall(r"\[(\d+)\]", t.split("## 出典・参考")[0]))
+          missing = sorted(cited - refs, key=int)
+          print(f"name={name}, description={len(desc)} chars, {len(ids)} items, duplicate IDs={dup}, missing refs={missing}")
+          ok = (re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", name) and len(name) <= 64
+                and 0 < len(desc) <= 1024 and not dup and not missing)
+          sys.exit(0 if ok else 1)
+          PY

@@ -1,6 +1,6 @@
 ---
 name: design-check-skill
-description: 'Audit-only design completeness checker for Apple-platform apps (iPhone, iPad, Mac, Apple Watch, plus "iPhone Duo" two-phone presentation mocks). Checks an existing UI design, screen spec, demo mock or development prompt against ID-numbered per-platform checklists, reports gaps (抜け) with evidence, fixes them (or writes fix instructions for visual files it cannot edit), and repeats audit passes from rotating viewpoints until three consecutive passes find no new gaps. Does NOT create designs, layouts, mockups or assets. Covers HIG compliance, size-class layout and resizing, orientation policy, Dark Mode, Dynamic Type, VoiceOver, contrast, Reduce Motion/Transparency, Safe Area, keyboard occlusion, iPad windowing/pointer/keyboard, Mac menus/shortcuts/windows, watchOS glanceability/complications, app icon specs and appearances, fictional mock data, PNG previews. Use when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
+description: 'Audit-only design completeness checker for Apple-platform apps (iPhone, iPhone Duo foldable, iPad, Mac, Apple Watch). Checks an existing UI design, screen spec, demo mock or development prompt against ID-numbered per-platform checklists, reports gaps (抜け) with evidence, fixes them (or writes fix instructions for visual files it cannot edit), and repeats audit passes from rotating viewpoints until three consecutive passes find no new gaps. Does NOT create designs, layouts, mockups or assets. Covers HIG compliance, size-class layout and resizing, orientation policy, Dark Mode, Dynamic Type, VoiceOver, contrast, Reduce Motion/Transparency, Safe Area, keyboard occlusion, iPhone Duo outer/inner displays and Split View, iPad windowing/pointer/keyboard, Mac menus/shortcuts/windows, watchOS glanceability/complications, app icon specs and appearances, fictional mock data, PNG previews. Use when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
 ---
 
 # design-check-skill
@@ -15,7 +15,7 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 
 ## 監査ループ（必須手順）
 
-1. **対象と範囲を決める** — 監査する成果物と、そのアプリの対応プラットフォーム（iPhone / iPad / Mac / Watch / iPhone Duoモックの要否）を特定する。不明ならプロンプトや仕様の記述から判断し、判断した根拠を報告に書く。対象外プラットフォームのリストは適用しない
+1. **対象と範囲を決める** — 監査する成果物と、そのアプリの対応プラットフォーム（iPhone / iPhone Duo / iPad / Mac / Watch）を特定する。不明ならプロンプトや仕様の記述から判断し、判断した根拠を報告に書く。対象外プラットフォームのリストは適用しない
 2. **成果物の種類で修正方法を決める**
    - **テキスト成果物**（設計書・画面仕様・開発プロンプト）： 成果物を直接書き換える
    - **ソースを編集できる視覚成果物**（SVG / HTML / Figma 等でツールから編集可能なもの）： ソースを直接修正し、PNGプレビューも再書き出しする
@@ -26,7 +26,7 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
    |---|---|---|
    | 1, 4, 7 | チェックリスト順 | 共通→各プラットフォーム→アイコン・成果物の順に全項目を判定 |
    | 2, 5, 8 | ユーザーフロー順 | 初回起動→主要フロー→権限拒否→データ空→無料版の上限到達→購入・復元→エラー の順に画面を辿り、各画面で関係する項目を判定 |
-   | 3, 6 | 状態マトリクス | ライト／ダーク × 標準／最大文字サイズ × 最小／最大ウィンドウ（iPadとMac）× 視差効果を減らす・透明度を下げる、の組み合わせで画面を想定して判定 |
+   | 3, 6 | 状態マトリクス | ライト／ダーク × 標準／最大文字サイズ × 最小／最大ウィンドウ（iPadとMac）× 外側／内側／内側の Split View（iPhone Duo）× 視差効果を減らす・透明度を下げる、の組み合わせで画面を想定して判定 |
 
 4. **抜けを直す** — 手順2の方法で修正する。修正が設計判断（機能範囲、課金、プラットフォーム追加、自社ルールの変更など）を変える場合は勝手に決めず、選択肢と推奨案を提示して**保留**にする。保留した項目は以後のパスで新規に数えない
 5. **再判定する** — 次のパス番号で手順3に戻る
@@ -82,14 +82,17 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 - **I-04** ポインタ（ホバー効果）とハードウェアキーボード（主要操作のショートカット）に対応している。主要コマンドはiPadのメニューバーにも出し、メニューバーにしかない機能を作らない（メニューバーは通常隠れているため）[8]
 - **I-05** 主要画面のモックがiPadフレームで用意されている
 
-### iPhone Duo（iPhone 2台並びの提示用モック）
+### iPhone Duo（折りたたみ iPhone。iPhoneアプリはすべて対象）
 
-「iPhone Duo」はAppleの用語ではなく、このスキルで使う提示形式の呼び名です。
+iPhone Duo は2026年9月発表の折りたたみ iPhone（外側5.4インチ、内側7.6インチ）。iPhone アプリはそのまま iPhone Duo でも動くので、iPhone 対応アプリでは原則この節も適用する。
 
-- **D-01** 2台の画面で状態が一致している（時刻、データ内容、選択状態、ライト／ダーク）
-- **D-02** 2画面の役割分担が分かる並びになっている（例： 一覧と詳細、操作前と操作後）
-- **D-03** 端末のサイズ・角度・余白・整列が揃い、影や反射の表現が過剰でない
-- **D-04** 小さく表示しても文字が読める
+- **D-01** 外側（閉じた状態）と内側（開いた状態）の両方の主要画面が設計され、モックがある [14]
+- **D-02** レイアウトを向きではなくサイズクラスで決めている。外側は通常の iPhone と同じ（縦向き＝横 compact・縦 regular）、内側は横・縦とも regular。内側はアプリの対応する向きの指定に従わないことを前提にしている [15]
+- **D-03** 内側でサイドバー（タブをサイドバーにする、またはサイドバー＋一覧＋詳細）を使い、iPhone 画面の引き伸ばしにしていない。内側の Split View（画面の左右どちらか半分）でも主要機能が使える [15]
+- **D-04** 開閉したときに、表示中の画面・選択・入力中の内容が引き継がれる [14]
+- **D-05** 標準のバーのボタンが縦に並ぶこと、ステータスバー・Dynamic Island が画面の横側に来ることを前提に、操作要素がそれらと重ならない。Safe Area は左右・上下で非対称として扱う [14][15]
+- **D-06** 横向きにも対応している（テントのように立てて置かれるため推奨）[15]
+- **D-07** スクリーンショット用の画像が iPhone Duo の寸法（外側 1398 × 2034 px、内側 2007 × 2853 px）で書き出せる。現時点は任意だが、2027年4月以降は iOS 27.1 SDK 以降でビルドしたアプリで必須 [13]
 
 ### Mac（Mac版・Mac対応があるアプリのみ）
 
@@ -121,6 +124,7 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 - **A-06** アイコンに文字を入れていない（HIG上は「体験やブランドに不可欠な場合だけ」。**自社ルールとして全面禁止**）。グリフが小サイズでも判別でき、写真やUI部品の複製を使っていない [10]
 - **A-07** 視覚成果物はベクター原版に加えてPNGのプレビューが添えられている（スマートフォン等、SVGを表示できない環境で確認するため）
 - **A-08** App Store掲載用スクリーンショットに転用するモックは、App Store Connectの必須サイズで書き出せる（透過なしのPNG / JPEG。サイズは提出時に最新の仕様を確認）[13]
+- **A-09** 2台並びなどの掲載用画像を作る場合、2画面の状態（時刻・データ・選択・ライト／ダーク）が一致し、役割分担が分かり、小さく表示しても文字が読める
 
 ## 報告フォーマット
 
@@ -166,3 +170,5 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 11. App Store Connect Help — Accessibility Nutrition Labels（「色だけに頼らない区別」等の申告項目）: https://developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels
 12. fresnel（レイヤードアイコン作成ツール）: https://github.com/kajisho5/fresnel
 13. App Store Connect Help — Screenshot specifications: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
+14. Apple Newsroom — Apple unveils iPhone Duo（2026-09-10）: https://www.apple.com/my/newsroom/2026/09/apple-unveils-iphone-duo/
+15. Apple Developer Tech Talk — Prepare your app for iPhone Duo: https://developer.apple.com/videos/play/tech-talks/111461/

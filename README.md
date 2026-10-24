@@ -1,6 +1,6 @@
 # design-check-skill
 
-Appleプラットフォーム（iPhone / iPad / Mac / Apple Watch、提示用の iPhone Duo モック）向けのUI設計・画面仕様・デモモック・開発プロンプトを、ID付きのプラットフォーム別チェックリストで監査し、「抜け」（必要なのに無い・曖昧な項目）を見つけて直すためのAgent Skillです。
+Appleプラットフォーム（iPhone / iPhone Duo（折りたたみ）/ iPad / Mac / Apple Watch）向けのUI設計・画面仕様・デモモック・開発プロンプトを、ID付きのプラットフォーム別チェックリストで監査し、「抜け」（必要なのに無い・曖昧な項目）を見つけて直すためのAgent Skillです。
 
 - チェックリストは 共通／iPhone／iPad／iPhone Duo／Mac／Apple Watch／アイコン・成果物形式 の7区分、各項目にID（例： `C-05`, `I-02`）
 - 監査は1回で終わらせず、抜けを直して再チェックする「監査ループ」を回します
