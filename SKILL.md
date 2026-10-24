@@ -1,6 +1,6 @@
 ---
 name: design-check-skill
-description: 'Audit-only design completeness checker for Apple-platform apps (iPhone, iPhone Duo foldable, iPad, Mac, Apple Watch). Checks an existing UI design, screen spec, demo mock or development prompt against ID-numbered per-platform checklists, reports gaps (抜け) with evidence, fixes them (or writes fix instructions for visual files it cannot edit), and repeats audit passes, each from a viewpoint not yet used in the loop, until three consecutive passes find no new gaps. Does NOT create designs, layouts, mockups or assets. Covers HIG compliance, size-class layout and resizing, orientation policy, Dark Mode, Dynamic Type, VoiceOver, contrast, Reduce Motion/Transparency, Safe Area, keyboard occlusion, iPhone Duo outer/inner displays and Split View, iPad windowing/pointer/keyboard, Mac menus/shortcuts/windows, watchOS glanceability/complications, app icon specs and appearances, fictional mock data, PNG previews. Use when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
+description: 'Audit-only design completeness checker for Apple-platform apps (iPhone, iPhone Duo foldable, iPad, Mac, Apple Watch). Checks an existing UI design, screen spec, demo mock or development prompt against ID-numbered per-platform checklists, reports gaps (抜け) with evidence, fixes them (or writes fix instructions for visual files it cannot edit), and repeats audit passes, each from a viewpoint not yet used in the loop, until three consecutive passes find no new serious gaps. Does NOT create designs, layouts, mockups or assets. Covers HIG compliance, size-class layout and resizing, orientation policy, Dark Mode, Dynamic Type, VoiceOver, contrast, Reduce Motion/Transparency, Safe Area, keyboard occlusion, iPhone Duo outer/inner displays and Split View, iPad windowing/pointer/keyboard, Mac menus/shortcuts/windows, watchOS glanceability/complications, app icon specs and appearances, fictional mock data, PNG previews. Use when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
 ---
 
 # design-check-skill
@@ -10,6 +10,10 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 ## 用語
 
 - **抜け**： 必要なのに書かれていない／作られていない項目、または「実装・制作する側が迷わず再現できる具体性」がない曖昧な記述。好みの問題は抜けに含めない
+- **重大な抜け**と**軽微な抜け**： 抜けは見つけたら必ずどちらかに分ける
+  - **重大**： 次のどれかに当たるもの。(1) チェックリストの項目・HIG・App Store の審査ガイドラインに反する (2) 使う人が操作できない、目的を果たせない、データを失う (3) アクセシビリティの基準を満たさない（コントラスト、当たり判定、読み上げのラベル、色だけの区別など）(4) 設計書とモックが食い違う、または決まっていないために、作る人が推測で決めるしかなく、推測を誤ると (1)〜(3) になる
+  - **軽微**： 重大に当たらないもの（まれな場合の細かい決め、文言の統一、より分かりやすくする工夫など）。直せるものは直すが、終了条件の判定には数えない
+  - 迷ったら重大にする。分けた理由を一言添える
 - **新規の抜け**： そのパスで初めて見つかった抜け。**前のパスの修正で新たに生じた不整合（デグレ）も新規に数える**。前のパスで記録済みで、ユーザー判断待ちのため保留しているものは数えない（保留一覧に残す）
 - **パス**： 適用対象の全チェック項目を1回判定し終えること
 
@@ -39,11 +43,11 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 
 **終了条件（厳格）**
 
-- 「新規の抜けゼロ」のパスが **3回連続** したら終了する。1パスでも新規の抜けが出たら連続カウントは0に戻る
-- パス上限は、そのループで使える観点の数（最大 **8**。対象に合わず飛ばす観点があれば、その分だけ少なくなる）。上限に達しても3連続ゼロにならない場合は、そこで止めて残件と理由を報告する
-- 上限に達した時点で見つけた抜けをすべて修正済みなら、修正後の成果物で**新しいループ**を始める（観点は V-01 から使い直す）。新しいループでも上限に達したら、そこで止めて報告する（ループは最大2回）
+- 「**新規の重大な抜けゼロ**」のパスが **3回連続** したら終了する。1パスでも新規の重大な抜けが出たら連続カウントは0に戻る。軽微な抜けは記録して直すが、連続カウントには影響しない（観点を変えるたびに細かい指摘は出続けるため、終わりの判定は重大なものだけで行う）
+- パス上限は、そのループで使える観点の数（最大 **8**。対象に合わず飛ばす観点があれば、その分だけ少なくなる）。上限に達しても重大ゼロが3連続にならない場合は、そこで止めて残件と理由を報告する
+- 上限に達した時点で見つけた重大な抜けをすべて修正済みなら、修正後の成果物で**新しいループ**を始める（観点は V-01 から使い直す）。新しいループでも上限に達したら、そこで止めて報告する（ループは最大2回）
 - 成果物の範囲が変わった（プラットフォームの追加など）とき、またはチェックリスト自体が変わったときも、新しいループとして数え直す（このときは「ループは最大2回」の数え方も最初からにする）
-- 「1回ゼロだった」だけでは終了しない。保留がある場合は「3連続ゼロ・保留N件」として終了し、保留一覧を必ず添える
+- 「1回ゼロだった」だけでは終了しない。保留がある場合は「重大ゼロ3連続・保留N件」として終了し、保留一覧を必ず添える
 
 ## チェックリスト
 
@@ -178,21 +182,21 @@ iPhone Duo は2026年9月発表の折りたたみ iPhone（外側5.4インチ、
 
 ```
 対象： （成果物名） ／ 対応プラットフォーム： （判断根拠）
-監査ループ結果： 総Nパスで終了（3連続ゼロ ／ 上限到達 ／ 修正待ちで一時停止）
+監査ループ結果： 総Nパスで終了（重大ゼロ3連続 ／ 上限到達 ／ 修正待ちで一時停止）
 
-| パス | 観点 | 新規の抜け | 抜けの項目ID | 連続ゼロ |
-|---|---|---|---|---|
-| 1 | V-01 チェックリスト順 | 5 | C-13, C-16, P-03, I-02, A-07 | 0 |
-| 2 | V-02 ユーザーフロー順 | 1 | C-14 | 0 |
-| 3 | V-03 状態マトリクス | 0 | ― | 1 |
-| … | | | | |
+| パス | 観点 | 新規の重大な抜け | 重大の項目ID | 新規の軽微な抜け | 重大ゼロの連続 |
+|---|---|---|---|---|---|
+| 1 | V-01 チェックリスト順 | 3 | C-13, C-16, I-02 | 2 | 0 |
+| 2 | V-02 ユーザーフロー順 | 1 | C-14 | 0 | 0 |
+| 3 | V-03 状態マトリクス | 0 | ― | 1 | 1 |
+| … | | | | | |
 
 監査した担当： （成果物を作った担当と同じか別か）
 
-見つけた抜け： ID ／ 根拠 ／ 修正内容（プラットフォーム別）
+見つけた抜け： 重大／軽微 ／ ID ／ 根拠 ／ 重大と判断した理由（重大の場合）／ 修正内容（プラットフォーム別）
 保留（ユーザー判断待ち）： ID ／ 選択肢 ／ 推奨案
 提案（抜けではない好みの指摘）： 箇条書き
-最終判定： 抜けゼロ（3パス連続）／ 残存する抜けとその理由
+最終判定： 重大な抜けゼロ（3パス連続）・残っている軽微な抜けN件 ／ 残存する重大な抜けとその理由
 ```
 
 ## やらないこと
