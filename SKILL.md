@@ -1,11 +1,11 @@
 ---
-name: design-skill
-description: 'Design-completeness checker for Apple-platform apps and their demo mocks: audit a UI design, screen spec, mock or development prompt against per-platform checklists for iPhone, iPad, iPhone Duo (two-iPhone side-by-side presentation) and Mac, find every missing item (抜け), fix, and re-check in a loop until zero gaps remain. Covers Apple HIG compliance, orientation policy, dark mode, Dynamic Type, VoiceOver and contrast, Safe Area / Dynamic Island / home indicator, keyboard occlusion, iPad Split View / Stage Manager / pointer / hardware keyboard, Mac menu bar / keyboard shortcuts / resizable windows, iPhone Duo state consistency, app icon appearance variants (light/dark/tinted, Liquid Glass via kajisho5/fresnel), and PNG deliverables because the user checks on iPhone. Use this skill whenever the user asks for a design check, a 抜けチェック, mock or screenshot review, or before finalising any app prompt or design — even when they do not say "skill".'
+name: design-check-skill
+description: 'Audit-only design completeness checker for Apple-platform apps. Checks an existing UI design, screen spec, demo mock or development prompt against per-platform checklists (iPhone, iPad, iPhone Duo, Mac, plus shared items), reports missing items （抜け）, fixes them, and re-checks in a loop until zero gaps remain. This skill does NOT create visual designs, layouts, mockups or assets — it only audits finished or drafted ones. Covers: HIG compliance, orientation policy, dark mode, Dynamic Type, VoiceOver, contrast, Safe Area, keyboard occlusion, iPad Split View / Stage Manager / pointer / hardware keyboard, Mac menu bar / shortcuts / resizable windows, iPhone Duo state consistency, app icon appearance variants, PNG deliverables. Use only when the user asks for a design check, 抜けチェック, or a mock/prompt review for an Apple-platform app.'
 ---
 
-# design-skill
+# design-check-skill
 
-Appleプラットフォーム向けデザインの「抜け」をなくすためのチェックリストと監査ループです。対象はアプリのUI設計・画面仕様・デモモック・開発プロンプト。**チェックして終わりにせず、抜けを直して再チェックし、抜けゼロになるまで回す**のがこのスキルの仕事です。
+Appleプラットフォーム向けデザインの「抜け」を監査するためのチェックリストと監査ループです。**監査専用であり、デザインそのもの（レイアウト、モック、素材）は作りません。** 対象は既存のUI設計・画面仕様・デモモック・開発プロンプト。**チェックして終わりにせず、抜けを直して再チェックし、抜けゼロになるまで回す**のがこのスキルの仕事です。
 
 ## 監査ループ（必須手順）
 
