@@ -1,0 +1,88 @@
+---
+name: design-skill
+description: 'Design-completeness checker for Apple-platform apps and their demo mocks: audit a UI design, screen spec, mock or development prompt against per-platform checklists for iPhone, iPad, iPhone Duo (two-iPhone side-by-side presentation) and Mac, find every missing item (抜け), fix, and re-check in a loop until zero gaps remain. Covers Apple HIG compliance, orientation policy, dark mode, Dynamic Type, VoiceOver and contrast, Safe Area / Dynamic Island / home indicator, keyboard occlusion, iPad Split View / Stage Manager / pointer / hardware keyboard, Mac menu bar / keyboard shortcuts / resizable windows, iPhone Duo state consistency, app icon appearance variants (light/dark/tinted, Liquid Glass via kajisho5/fresnel), and PNG deliverables because the user checks on iPhone. Use this skill whenever the user asks for a design check, a 抜けチェック, mock or screenshot review, or before finalising any app prompt or design — even when they do not say "skill".'
+---
+
+# design-skill
+
+Appleプラットフォーム向けデザインの「抜け」をなくすためのチェックリストと監査ループです。対象はアプリのUI設計・画面仕様・デモモック・開発プロンプト。**チェックして終わりにせず、抜けを直して再チェックし、抜けゼロになるまで回す**のがこのスキルの仕事です。
+
+## 監査ループ（必須手順）
+
+1. **対象を決める** — 設計書、モック、プロンプトなど、チェックする成果物を特定する。対象アプリの対応プラットフォームを確認し、関係するチェックリストだけを適用する（Mac版のないアプリにMacのリストは適用しない）
+2. **全項目を判定する** — チェックリストの各項目を「OK / 抜け / 対象外」で判定し、抜けには根拠（どの画面・どの記述に不足があるか）を付ける
+3. **抜けを直す** — 成果物自体を修正する。修正が設計判断を変える場合は、勝手に決めず選択肢と推奨をユーザーに提示する
+4. **再チェックする** — 修正後に全項目をもう一度判定する。新たな抜けが見つかれば 3 に戻る
+5. **報告する** — ループの結果（何周したか、見つけた抜けと修正内容、最終判定）を簡潔に報告する。抜けゼロで終わらなかった場合は、残った抜けと理由を明示する
+
+判定は「書いてあるか」ではなく「実装・制作する側が迷わず再現できる具体性があるか」で行う。曖昧な記述は抜けとして扱う。
+
+## チェックリスト： 共通（全プラットフォーム）
+
+- [ ] Apple HIGへの準拠が明示され、衝突時はHIG優先と決まっている
+- [ ] ダークモード： 色がアセットカタログで定義され、ライト／ダーク両方で確認する手順がある
+- [ ] Dynamic Type： 最大文字サイズでもレイアウトが崩れない
+- [ ] VoiceOver： 主要操作にラベルがあり、操作順序が自然
+- [ ] コントラスト： テキストと背景のコントラスト比が確保されている（WCAG AA相当を目安）
+- [ ] タップ／クリック対象は44pt以上（Macのポインタ操作は後述のMac節に従う）
+- [ ] SF Symbolsを使用し、独自アイコンの乱造をしていない
+- [ ] 空状態（データゼロ）の画面がある
+- [ ] エラー・権限拒否時の画面と、設定アプリ等への代替導線がある
+- [ ] 入力時にソフトウェアキーボードで重要なUIや入力中の項目が隠れない
+- [ ] 起動画面はシンプルで、広告・ロゴアニメ・待機演出を入れていない
+- [ ] UI文字列は String Catalogs で管理され、ハードコードされていない
+
+## チェックリスト： iPhone
+
+- [ ] 縦向き（ポートレート）基本。回転対応しない場合はその方針が明記されている（例外指定がある場合のみ回転対応）
+- [ ] Safe Area（Dynamic Island／ノッチ／ホームインジケータ）と重なる位置に操作要素がない
+- [ ] 片手操作を想定し、主要アクションが画面下部〜中部に届く配置になっている
+- [ ] ハーフモーダル（シート）の使い分けと、閉じる操作（スワイプ／ボタン）が一貫している
+- [ ] 主要画面のモックがiPhoneフレームで用意されている
+
+## チェックリスト： iPad
+
+- [ ] 回転（縦・横）に対応し、どちらの向きでもレイアウトが成立する
+- [ ] Split View / Stage Manager でウィンドウ幅が変わっても崩れない（最小幅でも主要機能が使える）
+- [ ] 画面の広さを使い切るレイアウト（サイドバー＋詳細など、iPhone画面の引き伸ばしにしていない）
+- [ ] ポインタ（ホバー効果）とハードウェアキーボード（主要操作のショートカット）に対応している
+- [ ] 主要画面のモックがiPadフレームで用意されている
+
+## チェックリスト： iPhone Duo（iPhone 2台並びの提示用モック）
+
+- [ ] 2台の画面で状態が一致している（時刻、データ内容、選択状態、ダーク／ライトのモード）
+- [ ] 2画面の役割分担が分かる（例： 一覧と詳細、操作前と操作後）並びになっている
+- [ ] 端末のサイズ・角度・余白・整列が揃い、影や反射の表現が過剰でない
+- [ ] 小さい表示でも文字が読める（App Store掲載素材に転用する前提の解像度と余白）
+- [ ] PNGで書き出されている（ユーザーはiPhoneで確認する。SVG単体は不可）
+
+## チェックリスト： Mac（Mac版・Mac対応があるアプリのみ）
+
+- [ ] 標準のメニューバー項目がある（アプリ情報、設定、ファイル、編集、表示、ウィンドウ、ヘルプ）
+- [ ] 主要操作にキーボードショートカットが割り当てられ、標準ショートカット（⌘C / ⌘V / ⌘W / ⌘Qなど）と衝突しない
+- [ ] ウィンドウのリサイズに追従し、最小サイズでも主要機能が使える
+- [ ] ポインタ前提の密度とホバー表現になっている（iPad画面の単純な拡大にしていない）
+- [ ] Designed for iPad で動作させる場合は、その旨とMac専用UIを作らない方針が明記されている
+- [ ] 主要画面のモックがMacフレーム（ウィンドウ表示）で用意されている
+
+## チェックリスト： アイコンと成果物の形式
+
+- [ ] アイコンは kajisho5/fresnel で作成し、Liquid Glassスタイルのレイヤードアイコン (.icon) になっている
+- [ ] ライト／ダーク／ティントの外観バリアントがある
+- [ ] アイコンに文字を入れておらず、グリフが小サイズでも判別できる
+- [ ] 視覚成果物はSVG原版に加えてPNGプレビューが添えられている（iPhoneで確認するため）
+
+## 報告フォーマット
+
+```
+監査ループ結果： N周で完了
+見つけた抜け： M件（内訳はプラットフォーム別に）
+修正内容： （箇条書き）
+最終判定： 抜けゼロ / 残存する抜けとその理由
+```
+
+## やらないこと
+
+- チェックだけで終わらせて修正しない（ループを回し切るのが仕事）
+- 対象外プラットフォームの項目を理由に抜け判定する（例： Mac版のないアプリにMacモックを求めない）
+- デザインの好みを抜けとして扱う（抜けは「必要なのに無い・曖昧」だけ。好みは提案として分けて述べる）
