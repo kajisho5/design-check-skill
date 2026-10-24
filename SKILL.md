@@ -70,7 +70,7 @@ Appleプラットフォーム向けデザインの「抜け」を監査するた
 - **C-17** 起動画面（iOS / iPadOS。Mac と Watch には不要）： Info.plist で構成され（iOS 27 SDK以降は提出の必須条件）、最初の画面とほぼ同じ骨格で、文字・広告・ロゴアニメ・待機演出がなく、ライト／ダークに対応している（デザイン成果物では、設計書に起動画面の方針が書かれていれば OK） [5][17]
 - **C-18** UI文字列は String Catalogs で管理され、ハードコードされていない（デザイン成果物では、設計書に文字列の管理方針が書かれていれば OK）
 - **C-19** モック・スクリーンショット・サンプルデータは**明らかに架空**の人名・住所・電話番号・会社名・画像を使い（実在の人物・住所・企業・作品を使わない）、性別の不要な表現や職業などのステレオタイプを避けている [17]
-- **C-20** ボタン： 当たり判定は入力方法にかかわらず44×44pt以上。目立つ（塗りの）ボタンは1画面2つまで。役割（通常／プライマリ／キャンセル／破壊的）が決まり、破壊的な操作は赤でプライマリにしていない。カスタムボタンに押された状態がある。時間のかかるボタンは中にインジケータを出す [17]
+- **C-20** ボタン： 当たり判定は入力方法にかかわらず44×44pt以上。目立つ（塗りの）ボタンは1画面2つまで（一覧の各行に同じボタンが繰り返す場合は、塗りにせず通常のボタンにする）。役割（通常／プライマリ／キャンセル／破壊的）が決まり、破壊的な操作は赤でプライマリにしていない。カスタムボタンに押された状態がある。時間のかかるボタンは中にインジケータを出す [17]
 - **C-21** モーダル： 1画面のシートは「キャンセル」が先頭・「完了」などが末尾で、3つ並べない。複数ステップのシートは2ステップ目以降の先頭が「戻る」で、「完了」は最後のステップで有効になる。つまみはサイズを変えられるシートだけ。編集中に閉じようとしたら確認する。モーダルを重ねない。アラートはボタン3つまで・確認は動詞（「OK」でなく「削除」）。ユーザーが始めた操作の選択肢はアクションシート（破壊的な項目は上で赤、キャンセルは下）。ポップオーバーは iPhone と細いウィンドウではシートにする [17]
 - **C-22** メニュー： 使えない項目は淡色（コンテキストメニューは非表示）。サブメニューは1階層。追加の入力が要る項目は末尾に「…」。主要な操作を「…」の中にしまわない。コンテキストメニューの項目はメインのUIからも使える [17]
 - **C-23** 入力欄： プレースホルダとは別にラベルがある。内容に合ったキーボードの種類と内容の種類（メール、電話番号など）、Return キーの表示が決まっている。必須項目が埋まるまで次へ進めない。選択で済むものは選択式 [17]
@@ -180,12 +180,14 @@ iPhone Duo は2026年9月発表の折りたたみ iPhone（外側5.4インチ、
 対象： （成果物名） ／ 対応プラットフォーム： （判断根拠）
 監査ループ結果： 総Nパスで終了（3連続ゼロ ／ 上限到達 ／ 修正待ちで一時停止）
 
-| パス | 観点 | 新規の抜け | 連続ゼロ |
-|---|---|---|---|
-| 1 | V-01 チェックリスト順 | 5 | 0 |
-| 2 | V-02 ユーザーフロー順 | 1 | 0 |
-| 3 | V-03 状態マトリクス | 0 | 1 |
-| … | | | |
+| パス | 観点 | 新規の抜け | 抜けの項目ID | 連続ゼロ |
+|---|---|---|---|---|
+| 1 | V-01 チェックリスト順 | 5 | C-13, C-16, P-03, I-02, A-07 | 0 |
+| 2 | V-02 ユーザーフロー順 | 1 | C-14 | 0 |
+| 3 | V-03 状態マトリクス | 0 | ― | 1 |
+| … | | | | |
+
+監査した担当： （成果物を作った担当と同じか別か）
 
 見つけた抜け： ID ／ 根拠 ／ 修正内容（プラットフォーム別）
 保留（ユーザー判断待ち）： ID ／ 選択肢 ／ 推奨案
@@ -221,6 +223,6 @@ iPhone Duo は2026年9月発表の折りたたみ iPhone（外側5.4インチ、
 14. Apple Newsroom — Apple unveils iPhone Duo（2026-09-10）: https://www.apple.com/my/newsroom/2026/09/apple-unveils-iphone-duo/
 15. Apple Developer Tech Talk — Prepare your app for iPhone Duo: https://developer.apple.com/videos/play/tech-talks/111461/
 16. HIG — Designing for iPhone Duo: https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo
-17. HIG 各ページ（Buttons、Sheets、Alerts、Menus、Text fields、Loading、Launching、Privacy、Notifications、In-app purchase、Writing、Inclusion、The menu bar、Settings、Always On、Widgets、Game controls、CarPlay、Tap to Pay on iPhone、ID Verifier、CareKit、ResearchKit、ShazamKit、Snippets、Branding ほか）。WWDC25・WWDC26 のデザイン講演（Liquid Glass、新しいデザインシステム、検索、iPad、アプリアイコン、Icon Composer、デザインの原則）は hig-specs.md の出典 [85]〜[92]: https://developer.apple.com/design/human-interface-guidelines 。項目ごとの要点と個別のURLは hig-design-skill の references/hig-specs.md §2〜§13
+17. HIG 各ページ（Buttons、Sheets、Alerts、Menus、Text fields、Loading、Launching、Privacy、Notifications、In-app purchase、Writing、Inclusion、The menu bar、Settings、Always On、Widgets、Game controls、CarPlay、Tap to Pay on iPhone、ID Verifier、CareKit、ResearchKit、ShazamKit、Snippets、Branding ほか）。WWDC25・WWDC26 のデザイン講演（Liquid Glass、新しいデザインシステム、検索、iPad、アプリアイコン、Icon Composer、デザインの原則）は hig-specs.md の出典 [85]〜[92]: https://developer.apple.com/design/human-interface-guidelines 。項目ごとの要点と個別のURLは hig-design-skill の references/hig-specs.md §2〜§15
 18. Apple Developer Tech Talk — Strike a pose with adaptive layouts on iPhone Duo: https://developer.apple.com/videos/play/tech-talks/111463/
 19. Apple Developer Tech Talk — Design for iPhone Duo: https://developer.apple.com/videos/play/tech-talks/111466/
